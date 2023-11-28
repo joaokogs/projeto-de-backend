@@ -6,6 +6,7 @@ const connection = require('./database/database');
 
 const AtletasRoutes = require('./ateltas/AtletasRoutes');
 const DanRoutes = require('./dan/DanRoutes');
+const AdminRoutes = require('./admin/AdminRoutes');
 
 const instalarDados = require('./instalador'); // 
 
@@ -20,10 +21,11 @@ const Admin = require('./admin/Admin');
 
 app.use("/",AtletasRoutes);
 app.use("/",DanRoutes);
+app.use("/",AdminRoutes);
 
 
-instalarDados();
-
+// instalarDados();
+  
 
 connection
     .authenticate()

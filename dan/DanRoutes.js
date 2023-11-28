@@ -26,5 +26,26 @@ router.post("/dan", async (req, res) => {
       res.status(500).json({ erro: 'Erro interno do servidor' });
     }
   });
+
+//lista todos os dans ==> dan?page=2
+
+  router.get('/dan', async (req, res) => {
+    try {
+      const page = req.query.page || 1; // Página atual, padrão é 1
+      const perPage = 5; // Atletas por página
+  
+      const offset = (page - 1) * perPage; // Calcula o deslocamento (offset)
+  
+      const dans = await Dan.findAll({
+        limit: perPage,
+        offset: offset,
+      });
+  
+      res.json(dans); // Retorna os atletas como resposta JSON
+    } catch (error) {
+      console.error('Erro ao buscar atletas:', error);
+      res.status(500).json({ error: 'Erro ao buscar atletas' });
+    }
+  });
   
 module.exports = router;

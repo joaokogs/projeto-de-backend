@@ -4,7 +4,6 @@ const Atletas = require('./Atletas');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Rota para criar um novo atleta
 router.post("/atleta", async (req, res) => {
   try {
     const { nome, email, senha, danId } = req.body;
@@ -24,22 +23,21 @@ router.post("/atleta", async (req, res) => {
 
     const hashSenha = await bcrypt.hash(senha, 10);
 
-    const novoAtleta = await Atletas.create({
+    const criarNovoAtleta = await Atletas.create({
       nome,
       email,
       senha: hashSenha,
-      danId
+      danId: danId
     });
 
-    res.status(201).json({ mensagem: 'Atleta cadastrado com sucesso!', atleta: novoAtleta });
+    res.status(201).json({ mensagem: 'Atleta cadastrado com sucesso!', atleta: criarNovoAtleta });
   } catch (error) {
     console.error('Erro ao criar atleta:', error);
     res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 });
 
-// Rota para fazer login e gerar token JWT
-router.post('/login', async (req, res) => {
+router.post('/atleta/login', async (req, res) => {
   try {
     const { email, senha } = req.body;
 
@@ -55,7 +53,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ erro: 'Credenciais inválidas' });
     }
 
-    const token = jwt.sign({ id: atleta.id, email: atleta.email }, 'seuSegredo', { expiresIn: '30s' });
+    const token = jwt.sign({ id: atleta.id, email: atleta.email, userType: 'atleta' }, 'seuSegredo', { expiresIn: '30s' });
 
     res.json({ token });
   } catch (error) {
@@ -64,7 +62,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Middleware para verificar o token JWT
 function verifyToken(req, res, next) {
   const token = req.headers.authorization;
 
@@ -82,8 +79,7 @@ function verifyToken(req, res, next) {
   });
 }
 
-// Rota protegida para listar todos os atletas, requer autenticação
-router.get('/atletas', verifyToken, async (req, res) => {
+router.get('/atleta', verifyToken, async (req, res) => {
   try {
     const page = req.query.page || 1;
     const perPage = 5;
@@ -100,5 +96,5 @@ router.get('/atletas', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar atletas' });
   }
 });
-
+  
 module.exports = router;

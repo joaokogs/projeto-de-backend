@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Admin = require('./Admin');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+// Rota para criar um novo admin
 router.post("/admin", async (req, res) => {
   try {
     const { user, senha } = req.body;
@@ -29,23 +31,66 @@ router.post("/admin", async (req, res) => {
   }
 });
 
-  
-router.get('/admin', async (req, res) => {
+// Rota para realizar login do admin
+router.post('/admin/login', async (req, res) => {
   try {
-    const page = req.query.page || 1; // Página atual, padrão é 1
-    const perPage = 5; // Atletas por página
+    const { user, senha } = req.body;
 
-    const offset = (page - 1) * perPage; // Calcula o deslocamento (offset)
+    const admin = await Admin.findOne({ where: { user } });
+
+    if (!admin) {
+      return res.status(404).json({ erro: 'Admin não encontrado' });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, admin.senha);
+
+    if (!senhaValida) {
+      return res.status(401).json({ erro: 'Credenciais inválidas' });
+    }
+
+    const token = jwt.sign({ id: admin.id, user: admin.user, userType: 'admin' }, 'seuSegredo', { expiresIn: '30s' });
+
+    res.json({ token });
+  } catch (error) {
+    console.error('Erro ao fazer login:', error);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
+  }
+});
+
+// Middleware para verificar o token JWT
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ erro: 'Token não fornecido' });
+  }
+
+  jwt.verify(token.split(' ')[1], 'seuSegredo', (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ erro: 'Falha na autenticação do token' });
+    }
+
+    req.adminId = decoded.id;
+    next();
+  });
+}
+
+// Rota protegida para listar todos os admins, requer autenticação
+router.get('/admin', verifyToken, async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const perPage = 5;
+    const offset = (page - 1) * perPage;
 
     const admins = await Admin.findAll({
       limit: perPage,
       offset: offset,
     });
 
-    res.json(admins); // Retorna os atletas como resposta JSON
+    res.json(admins);
   } catch (error) {
-    console.error('Erro ao buscar atletas:', error);
-    res.status(500).json({ error: 'Erro ao buscar atletas' });
+    console.error('Erro ao buscar admins:', error);
+    res.status(500).json({ error: 'Erro ao buscar admins' });
   }
 });
   

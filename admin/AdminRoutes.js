@@ -49,7 +49,7 @@ router.post('/admin/login', async (req, res) => {
       return res.status(401).json({ erro: 'Credenciais inválidas' });
     }
 
-    const token = jwt.sign({ id: admin.id, user: admin.user, userType: 'admin' }, 'seuSegredo', { expiresIn: '30s' });
+    const token = jwt.sign({ id: admin.id, user: admin.user, userType: 'admin' }, 'seuSegredo', { expiresIn: '1h' });
 
     res.json({ token });
   } catch (error) {
@@ -113,6 +113,38 @@ router.delete('/admin/excluir-atleta', verifyToken, async (req, res) => {
     res.status(200).json({ mensagem: 'Atleta excluído com sucesso' });
   } catch (error) {
     console.error('Erro ao excluir atleta:', error);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
+  }
+});
+
+// Rota para o admin editar informações (user e senha)
+router.put('/admin/editar-info', verifyToken, async (req, res) => {
+  try {
+    const { user, senha } = req.body;
+
+    // Encontra o admin pelo ID
+    const admin = await Admin.findByPk(req.adminId);
+
+    if (!admin) {
+      return res.status(404).json({ erro: 'Admin não encontrado' });
+    }
+
+    // Atualiza as informações 
+    if (user) {
+      admin.user = user;
+    }
+
+    if (senha) {
+      const hashSenha = await bcrypt.hash(senha, 10);
+      admin.senha = hashSenha;
+    }
+
+    // Salva as alterações no admin
+    await admin.save();
+
+    res.status(200).json({ mensagem: 'Informações do admin atualizadas com sucesso' });
+  } catch (error) {
+    console.error('Erro ao editar informações do admin:', error);
     res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 });

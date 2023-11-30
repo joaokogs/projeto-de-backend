@@ -2,12 +2,17 @@
 const Atletas = require('./ateltas/Atletas');
 const Dan = require('./dan/Dan');
 const Admin = require('./admin/Admin')
+const bcrypt = require('bcryptjs');
+
+
 
 // Função para criar dados fictícios
 async function instalarDados() {
   try {
     // Criação de atletas fictícios
     // const atletasCriados = await Atletas.bulkCreate([
+      const senha = "senha123";
+      const hashSenha = await bcrypt.hash(senha, 10);
     //   {
     //     nome: 'Atleta 1',
     //     email: 'atleta1@email.com',
@@ -76,12 +81,20 @@ async function instalarDados() {
     //   },
     //   // Adicione mais objetos conforme necessário
     // ]);
-
     const adminsCriados = await Admin.bulkCreate([
+      // {
+      //   user: 'Jp222',
+      //   senha: 'senha123'
+      // }
+      // {
+      //   user:'thais',
+      //   senha:'senha123'
+      // }
       {
-        user: 'Jp222',
-        senha: 'senha123'
+        user:'Pedro',
+        senha: hashSenha
       }
+
     ])
 
     // console.log('Dados fictícios criados:', atletasCriados, dansCriados,adminsCriados);

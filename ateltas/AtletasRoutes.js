@@ -53,7 +53,7 @@ router.post('/atleta/login', async (req, res) => {
       return res.status(401).json({ erro: 'Credenciais inválidas' });
     }
 
-    const token = jwt.sign({ id: atleta.id, email: atleta.email, userType: 'atleta' }, 'seuSegredo', { expiresIn: '30s' });
+    const token = jwt.sign({ id: atleta.id, email: atleta.email, userType: 'atleta' }, 'seuSegredo', { expiresIn: '1h' });
 
     res.json({ token });
   } catch (error) {
@@ -94,6 +94,47 @@ router.get('/atleta', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Erro ao buscar atletas:', error);
     res.status(500).json({ error: 'Erro ao buscar atletas' });
+  }
+});
+
+// Rota para o atleta atualizar suas informações
+router.put('/atleta/atualizar-info', verifyToken, async (req, res) => {
+  try {
+    const { nome, email, senha, danId } = req.body;
+    const atletaId = req.atletaId; // ID do atleta logado
+
+    // Encontra o atleta pelo ID
+    const atleta = await Atletas.findByPk(atletaId);
+
+    if (!atleta) {
+      return res.status(404).json({ erro: 'Atleta não encontrado' });
+    }
+
+    // Atualiza as informações (nome, email, senha e danId)
+    if (nome) {
+      atleta.nome = nome;
+    }
+
+    if (email) {
+      atleta.email = email;
+    }
+
+    if (senha) {
+      const hashSenha = await bcrypt.hash(senha, 10);
+      atleta.senha = hashSenha;
+    }
+
+    if (danId) {
+      atleta.danId = danId;
+    }
+
+    // Salva as alterações no atleta
+    await atleta.save();
+
+    res.status(200).json({ mensagem: 'Informações do atleta atualizadas com sucesso' });
+  } catch (error) {
+    console.error('Erro ao atualizar informações do atleta:', error);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 });
   

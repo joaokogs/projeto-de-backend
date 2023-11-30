@@ -8,7 +8,7 @@ const AtletasRoutes = require('./ateltas/AtletasRoutes');
 const DanRoutes = require('./dan/DanRoutes');
 const AdminRoutes = require('./admin/AdminRoutes');
 
-const instalarDados = require('./instalador'); // 
+const install = require('./instalador'); // 
 
 //BodyParser
 app.use(bodyParser.urlencoded({extended: false}));
@@ -22,9 +22,11 @@ const Admin = require('./admin/Admin');
 app.use("/atletas",AtletasRoutes);
 app.use("/dans",DanRoutes);
 app.use("/admin",AdminRoutes);
+app.use("/",install);
 
 
-// instalarDados();
+
+
 
 connection
     .authenticate()

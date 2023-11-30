@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const Atletas = require('../ateltas/Atletas')
 
 // Rota para criar um novo admin
-router.post("/admin",verifyToken, async (req, res) => {
+router.post("/",verifyAdminToken, async (req, res) => {
   try {
     const { user, senha } = req.body;
 
@@ -33,7 +33,7 @@ router.post("/admin",verifyToken, async (req, res) => {
 });
 
 // Rota para realizar login do admin
-router.post('/admin/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { user, senha } = req.body;
 
@@ -58,8 +58,8 @@ router.post('/admin/login', async (req, res) => {
   }
 });
 
-// Middleware para verificar o token JWT
-function verifyToken(req, res, next) {
+// Função para verificar o token JWT do admin
+function verifyAdminToken(req, res, next) {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -71,13 +71,18 @@ function verifyToken(req, res, next) {
       return res.status(403).json({ erro: 'Falha na autenticação do token' });
     }
 
+    //verifica se o JWT é de um adm ou de um atleta
+    if (decoded.userType !== 'admin') {
+      return res.status(403).json({ erro: 'Acesso negado. Não é um admin.' });
+    }
+
     req.adminId = decoded.id;
     next();
   });
 }
 
-// Rota protegida para listar todos os admins, requer autenticação
-router.get('/admin', verifyToken, async (req, res) => {
+// Rota para listar todos os admins, apenas 5 por pagina
+router.get('/', verifyAdminToken, async (req, res) => {
   try {
     const page = req.query.page || 1;
     const perPage = 5;
@@ -96,8 +101,8 @@ router.get('/admin', verifyToken, async (req, res) => {
 });
 
 
-// Rota para o admin excluir um atleta pelo ID
-router.delete('/admin/excluir-atleta', verifyToken, async (req, res) => {
+// Rota para o admin excluir um atleta pelo email
+router.delete('/excluir-atleta', verifyAdminToken, async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -117,8 +122,8 @@ router.delete('/admin/excluir-atleta', verifyToken, async (req, res) => {
   }
 });
 
-// Rota para o admin editar informações (user e senha)
-router.put('/admin/editar-info', verifyToken, async (req, res) => {
+// Rota para editar os dados de admins
+router.put('/editar', verifyAdminToken, async (req, res) => {
   try {
     const { user, senha } = req.body;
 
@@ -146,6 +151,25 @@ router.put('/admin/editar-info', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Erro ao editar informações do admin:', error);
     res.status(500).json({ erro: 'Erro interno do servidor' });
+  }
+});
+
+//Rota para listar todos os atletas com todos os dados, apenas 5 atletas por pagina
+router.get('/atletas', verifyAdminToken, async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const perPage = 5;
+    const offset = (page - 1) * perPage;
+
+    const atletas = await Atletas.findAll({
+      limit: perPage,
+      offset: offset,
+    });
+
+    res.json(atletas);
+  } catch (error) {
+    console.error('Erro ao buscar atletas:', error);
+    res.status(500).json({ error: 'Erro ao buscar atletas' });
   }
 });
   

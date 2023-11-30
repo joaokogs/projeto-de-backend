@@ -3,8 +3,11 @@ const router = express.Router();
 const Atletas = require('./Atletas');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Dan = require('../dan/Dan');
 
-router.post("/atleta", async (req, res) => {
+
+//Rota para criar novo atleta
+router.post("/", async (req, res) => {
   try {
     const { nome, email, senha, danId } = req.body;
 
@@ -37,7 +40,8 @@ router.post("/atleta", async (req, res) => {
   }
 });
 
-router.post('/atleta/login', async (req, res) => {
+//Rota para logar como atleta
+router.post('/login', async (req, res) => {
   try {
     const { email, senha } = req.body;
 
@@ -62,6 +66,7 @@ router.post('/atleta/login', async (req, res) => {
   }
 });
 
+//Função para verificar o token jwt de atleta
 function verifyToken(req, res, next) {
   const token = req.headers.authorization;
 
@@ -79,26 +84,8 @@ function verifyToken(req, res, next) {
   });
 }
 
-router.get('/atleta', verifyToken, async (req, res) => {
-  try {
-    const page = req.query.page || 1;
-    const perPage = 5;
-    const offset = (page - 1) * perPage;
-
-    const atletas = await Atletas.findAll({
-      limit: perPage,
-      offset: offset,
-    });
-
-    res.json(atletas);
-  } catch (error) {
-    console.error('Erro ao buscar atletas:', error);
-    res.status(500).json({ error: 'Erro ao buscar atletas' });
-  }
-});
-
-// Rota para o atleta atualizar suas informações
-router.put('/atleta/atualizar-info', verifyToken, async (req, res) => {
+// Rota para o atleta atualizar seus dados
+router.put('/editar', verifyToken, async (req, res) => {
   try {
     const { nome, email, senha, danId } = req.body;
     const atletaId = req.atletaId; // ID do atleta logado
@@ -137,5 +124,31 @@ router.put('/atleta/atualizar-info', verifyToken, async (req, res) => {
     res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 });
+
+
+//Rota que mostra todos os atletas que tem um mesmo dan --> lógica de negocio
+router.get('/dan/:id', async (req, res) => {
+  try {
+    const danId = req.params.id;
+
+    const atletasComDanId = await Atletas.findAll({
+      where: {
+        danId: danId
+      },
+      attributes: ['nome'],
+      include: [{
+        model: Dan,
+        attributes: ['nome'],
+        as: 'dan',
+      }]
+    });
+
+    res.json(atletasComDanId);
+  } catch (error) {
+    console.error('Erro ao buscar atletas por ID de Dan:', error);
+    res.status(500).json({ error: 'Erro ao buscar atletas por ID de Dan' });
+  }
+});
+
   
 module.exports = router;

@@ -1,106 +1,71 @@
-// Importe seus modelos do Sequelize
 const Atletas = require('./ateltas/Atletas');
 const Dan = require('./dan/Dan');
 const Admin = require('./admin/Admin')
 const bcrypt = require('bcryptjs');
+const express = require('express')
+const router = express.Router();
 
-
-
-// Função para criar dados fictícios
-async function instalarDados() {
+router.get('/install', async (req, res) => {
   try {
-    // Criação de atletas fictícios
-    // const atletasCriados = await Atletas.bulkCreate([
-      const senha = "senha123";
-      const hashSenha = await bcrypt.hash(senha, 10);
-    //   {
-    //     nome: 'Atleta 1',
-    //     email: 'atleta1@email.com',
-    //     senha: 'senha123',
-    //     danId: 1
+    // Dados fictícios para administradores
+    const adminData = [
+      { user: 'admin1', senha: 'senha123' },
+      { user: 'admin2', senha: 'senha456' }
+      // Adicione mais objetos conforme necessário
+    ];
 
-    //   },
-    //   {
-    //     nome: 'Atleta 3',
-    //     email: 'atleta32@email.com',
-    //     senha: 'senha789',
-    //     danId:4
-    //   },
-    //   {
-    //     nome: 'Atleta 4',
-    //     email: 'atleta42@email.com',
-    //     senha: 'senha1011',
-    //     danId:5
-    //   },
-    //   {
-    //     nome: 'Atleta 5',
-    //     email: 'atleta52@email.com',
-    //     senha: 'senha1213',
-    //     danId:6
-    //   },
-    //   {
-    //     nome: 'Atleta 6',
-    //     email: 'atleta62@email.com',
-    //     senha: 'senha1415',
-    //     danId:7
-    //   },
-    //   {
-    //     nome: 'Atleta 7',
-    //     email: 'atleta82@email.com',
-    //     senha: 'senha1617',
-    //     danId:8
-    //   },
-    //   // Adicione mais objetos conforme necessário
-    // ]);
-
-    // // Criação de dans fictícios
-    // const dansCriados = await Dan.bulkCreate([
-    //   {
-    //     nome: '1º Kyu',
-    //   },
-    //   {
-    //     nome: '1º Dan',
-    //   },
-    //   {
-    //     nome: '2º Dan',
-    //   },
-    //   {
-    //     nome: '3º Dan',
-    //   },
-    //   {
-    //     nome: '4º Dan',
-    //   },
-    //   {
-    //     nome: '5º Dan',
-    //   },
-    //   {
-    //     nome: '6º Dan',
-    //   },
-    //   {
-    //     nome: '7º Dan',
-    //   },
-    //   // Adicione mais objetos conforme necessário
-    // ]);
-    const adminsCriados = await Admin.bulkCreate([
-      // {
-      //   user: 'Jp222',
-      //   senha: 'senha123'
-      // }
-      // {
-      //   user:'thais',
-      //   senha:'senha123'
-      // }
-      {
-        user:'Pedro',
+    // Inserindo administradores fictícios
+    for (const admin of adminData) {
+      const hashSenha = await bcrypt.hash(admin.senha, 10);
+      await Admin.create({
+        user: admin.user,
         senha: hashSenha
-      }
+      });
+    }
 
-    ])
+    // Dados fictícios para atletas
+    const atletaData = [
+      { nome: 'Atleta 1', email: 'atleta1@email.com', senha: 'senha123', danId: 1 },
+      { nome: 'Atleta 2', email: 'atleta2@email.com', senha: 'senha456', danId: 2 }
+      // Adicione mais objetos conforme necessário
+    ];
 
-    // console.log('Dados fictícios criados:', atletasCriados, dansCriados,adminsCriados);
+    // Inserindo atletas fictícios
+    for (const atleta of atletaData) {
+      const hashSenha = await bcrypt.hash(atleta.senha, 10);
+      await Atletas.create({
+        nome: atleta.nome,
+        email: atleta.email,
+        senha: hashSenha,
+        danId: atleta.danId
+      });
+    }
+
+    const dansData =[
+      {nome:'1º Kyo'},
+      {nome:'1º Dan'},
+      {nome:'2º Dan'},
+      {nome:'3º Dan'},
+      {nome:'4º Dan'},
+      {nome:'5º Dan'},
+      {nome:'6º Dan'},
+      {nome:'7º Dan'}
+    
+    ]
+
+    for(const dan of dansData){
+      await Dan.create({
+        nome: dan.nome
+      });
+    }
+
+    res.status(201).json({ message: 'Dados fictícios instalados com sucesso!' });
   } catch (error) {
-    console.error('Erro ao criar dados fictícios:', error);
+    console.error('Erro ao instalar dados fictícios:', error);
+    res.status(500).json({ error: 'Erro ao instalar dados fictícios' });
   }
-}
+});
 
-module.exports = instalarDados;
+module.exports = router;
+
+

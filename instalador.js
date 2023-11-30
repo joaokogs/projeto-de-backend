@@ -7,14 +7,9 @@ const router = express.Router();
 
 router.get('/install', async (req, res) => {
   try {
-    // Dados fictícios para administradores
     const adminData = [
-      { user: 'admin1', senha: 'senha123' },
-      { user: 'admin2', senha: 'senha456' }
-      // Adicione mais objetos conforme necessário
+      { user: 'Jpyk', senha: 'senha123' },
     ];
-
-    // Inserindo administradores fictícios
     for (const admin of adminData) {
       const hashSenha = await bcrypt.hash(admin.senha, 10);
       await Admin.create({
@@ -22,12 +17,15 @@ router.get('/install', async (req, res) => {
         senha: hashSenha
       });
     }
-
-    // Dados fictícios para atletas
     const atletaData = [
-      { nome: 'Atleta 1', email: 'atleta1@email.com', senha: 'senha123', danId: 1 },
-      { nome: 'Atleta 2', email: 'atleta2@email.com', senha: 'senha456', danId: 2 }
-      // Adicione mais objetos conforme necessário
+      { nome: 'João Pedro', email: 'joao@gmail.com', senha: 'senha123', danId: 3 },
+      { nome: 'Thais', email: 'thais@gmail.com', senha: 'senha123', danId: 2 },
+      { nome: 'Matheus', email: 'matheus@gmail.com', senha: 'senha123', danId: 1 },
+      { nome: 'Marcelo', email: 'marcelo@gmail.com', senha: 'senha123', danId: 4 },
+      { nome: 'Wilson', email: 'wilson@gmail.com', senha: 'senha123', danId: 5 },
+      { nome: 'Edson', email: 'edson@gmail.com', senha: 'senha123', danId: 6 },
+      { nome: 'Lucas', email: 'lucas@gmail.com', senha: 'senha123', danId: 7 },
+      { nome: 'Emi', email: 'emi@gmail.com', senha: 'senha123', danId: 8 },
     ];
 
     // Inserindo atletas fictícios

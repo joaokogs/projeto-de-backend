@@ -3,10 +3,11 @@ const router = express.Router();
 const Admin = require('./Admin');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const Atletas = require('../ateltas/Atletas')
+const Atletas = require('../ateltas/Atletas');
+const Dan = require('../dan/Dan');
 
 // Rota para criar um novo admin
-router.post("/",verifyAdminToken, async (req, res) => {
+router.post("/",tokenAdm, async (req, res) => {
   try {
     const { user, senha } = req.body;
 
@@ -59,7 +60,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Função para verificar o token JWT do admin
-function verifyAdminToken(req, res, next) {
+function tokenAdm(req, res, next) {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -82,7 +83,7 @@ function verifyAdminToken(req, res, next) {
 }
 
 // Rota para listar todos os admins, apenas 5 por pagina
-router.get('/', verifyAdminToken, async (req, res) => {
+router.get('/', tokenAdm, async (req, res) => {
   try {
     const page = req.query.page || 1;
     const perPage = 5;
@@ -102,11 +103,10 @@ router.get('/', verifyAdminToken, async (req, res) => {
 
 
 // Rota para o admin excluir um atleta pelo email
-router.delete('/excluir-atleta', verifyAdminToken, async (req, res) => {
+router.delete('/atletas/deletar', tokenAdm, async (req, res) => {
   try {
     const { email } = req.body;
 
-    // Encontra o atleta pelo email e o exclui
     const atleta = await Atletas.findOne({ where: { email } });
 
     if (!atleta) {
@@ -123,18 +123,16 @@ router.delete('/excluir-atleta', verifyAdminToken, async (req, res) => {
 });
 
 // Rota para editar os dados de admins
-router.put('/editar', verifyAdminToken, async (req, res) => {
+router.put('/editar', tokenAdm, async (req, res) => {
   try {
     const { user, senha } = req.body;
 
-    // Encontra o admin pelo ID
     const admin = await Admin.findByPk(req.adminId);
 
     if (!admin) {
       return res.status(404).json({ erro: 'Admin não encontrado' });
     }
-
-    // Atualiza as informações 
+ 
     if (user) {
       admin.user = user;
     }
@@ -144,7 +142,6 @@ router.put('/editar', verifyAdminToken, async (req, res) => {
       admin.senha = hashSenha;
     }
 
-    // Salva as alterações no admin
     await admin.save();
 
     res.status(200).json({ mensagem: 'Informações do admin atualizadas com sucesso' });
@@ -155,7 +152,7 @@ router.put('/editar', verifyAdminToken, async (req, res) => {
 });
 
 //Rota para listar todos os atletas com todos os dados, apenas 5 atletas por pagina
-router.get('/atletas', verifyAdminToken, async (req, res) => {
+router.get('/atletas', tokenAdm, async (req, res) => {
   try {
     const page = req.query.page || 1;
     const perPage = 5;
@@ -170,6 +167,74 @@ router.get('/atletas', verifyAdminToken, async (req, res) => {
   } catch (error) {
     console.error('Erro ao buscar atletas:', error);
     res.status(500).json({ error: 'Erro ao buscar atletas' });
+  }
+});
+
+// Rota para admins editarem dados dos atletas
+router.put('/atletas/editar/:email', tokenAdm, async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { nome, novaSenha, novoDanId } = req.body;
+
+    const atleta = await Atletas.findOne({ where: { email } });
+    if (!atleta) {
+      return res.status(404).json({ error: 'Atleta não encontrado' });
+    }
+
+    atleta.nome = nome || atleta.nome;
+    if (novaSenha) {
+      const hashSenha = await bcrypt.hash(novaSenha, 10);
+      atleta.senha = hashSenha;
+    }
+    atleta.danId = novoDanId || atleta.danId;
+
+    await atleta.save();
+
+    res.json({ message: 'Dados do atleta atualizados com sucesso' });
+  } catch (error) {
+    console.error('Erro ao editar dados do atleta:', error);
+    res.status(500).json({ error: 'Erro ao editar dados do atleta' });
+  }
+});
+
+// Rota para deletar um admin
+router.delete('/deletar/:user',tokenAdm, async (req, res) => {
+  try {
+    const { user } = req.params;
+    const admin = await Admin.findOne({ where: { user } });
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin não encontrado' });
+    }
+    await admin.destroy();
+
+    res.json({ message: 'Admin excluído com sucesso' });
+  } catch (error) {
+    console.error('Erro ao excluir admin:', error);
+    res.status(500).json({ error: 'Erro ao excluir admin' });
+  }
+});
+
+// Rota para criar um dan
+router.post("/dan",tokenAdm, async (req, res) => {
+  try {
+    const {nome} = req.body;
+
+    const danExistente = await Dan.findOne({
+      where: {nome}
+    });
+
+    if (danExistente) {
+      return res.status(400).json({ erro: 'Dan já cadastrado' });
+    }
+
+    const CriarNovoDan = await Dan.create({
+      nome,
+    });
+
+    res.status(201).json({ mensagem: 'Dan cadastrado com sucesso!', dan: CriarNovoDan });
+  } catch (error) {
+    console.error('Erro ao criar dan:', error);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 });
   

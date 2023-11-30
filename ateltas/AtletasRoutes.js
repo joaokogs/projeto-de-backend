@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
 });
 
 //Função para verificar o token jwt de atleta
-function verifyToken(req, res, next) {
+function tokenAtleta(req, res, next) {
   const token = req.headers.authorization;
 
   if (!token) {
@@ -85,7 +85,7 @@ function verifyToken(req, res, next) {
 }
 
 // Rota para o atleta atualizar seus dados
-router.put('/editar', verifyToken, async (req, res) => {
+router.put('/editar', tokenAtleta, async (req, res) => {
   try {
     const { nome, email, senha, danId } = req.body;
     const atletaId = req.atletaId; // ID do atleta logado

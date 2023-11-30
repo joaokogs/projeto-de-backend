@@ -19,13 +19,12 @@ const Dan = require('./dan/Dan');
 const Atletas = require('./ateltas/Atletas');
 const Admin = require('./admin/Admin');
 
-app.use("/",AtletasRoutes);
-app.use("/",DanRoutes);
-app.use("/",AdminRoutes);
+app.use("/atletas",AtletasRoutes);
+app.use("/dans",DanRoutes);
+app.use("/admin",AdminRoutes);
 
 
 // instalarDados();
-  
 
 connection
     .authenticate()

@@ -3,9 +3,10 @@ const router = express.Router();
 const Admin = require('./Admin');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Atletas = require('../ateltas/Atletas')
 
 // Rota para criar um novo admin
-router.post("/admin", async (req, res) => {
+router.post("/admin",verifyToken, async (req, res) => {
   try {
     const { user, senha } = req.body;
 
@@ -91,6 +92,28 @@ router.get('/admin', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Erro ao buscar admins:', error);
     res.status(500).json({ error: 'Erro ao buscar admins' });
+  }
+});
+
+
+// Rota para o admin excluir um atleta pelo ID
+router.delete('/admin/excluir-atleta', verifyToken, async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Encontra o atleta pelo email e o exclui
+    const atleta = await Atletas.findOne({ where: { email } });
+
+    if (!atleta) {
+      return res.status(404).json({ erro: 'Atleta não encontrado' });
+    }
+
+    await atleta.destroy();
+
+    res.status(200).json({ mensagem: 'Atleta excluído com sucesso' });
+  } catch (error) {
+    console.error('Erro ao excluir atleta:', error);
+    res.status(500).json({ erro: 'Erro interno do servidor' });
   }
 });
   

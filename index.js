@@ -26,7 +26,7 @@ app.use("/atletas",AtletasRoutes);
 app.use("/dans",DanRoutes);
 app.use("/admin",AdminRoutes);
 app.use("/",install);
-app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(swaggerFile));
+app.use("/docs",swaggerUI.serve,swaggerUI.setup(swaggerFile));
 
 
 

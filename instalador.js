@@ -6,6 +6,7 @@ const express = require('express')
 const router = express.Router();
 
 router.get('/install', async (req, res) => {
+   // #swagger.summary = "Instala dados ficticios para seu banco de dados"
   try {
     const adminData = [
       { user: 'Jpyk', senha: 'senha123' },

@@ -8,7 +8,10 @@ const AtletasRoutes = require('./ateltas/AtletasRoutes');
 const DanRoutes = require('./dan/DanRoutes');
 const AdminRoutes = require('./admin/AdminRoutes');
 
-const install = require('./instalador'); // 
+const install = require('./instalador');
+
+const swaggerUI = require('swagger-ui-express');
+const swaggerFile = require('./swagger_doc.json');
 
 //BodyParser
 app.use(bodyParser.urlencoded({extended: false}));
@@ -23,6 +26,7 @@ app.use("/atletas",AtletasRoutes);
 app.use("/dans",DanRoutes);
 app.use("/admin",AdminRoutes);
 app.use("/",install);
+app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(swaggerFile));
 
 
 

@@ -8,6 +8,7 @@ const Dan = require('../dan/Dan');
 
 //Rota para criar novo atleta
 router.post("/", async (req, res) => {
+  // #swagger.summary = "Cria um novo atleta"
   try {
     const { nome, email, senha, danId } = req.body;
 
@@ -42,6 +43,7 @@ router.post("/", async (req, res) => {
 
 //Rota para logar como atleta
 router.post('/login', async (req, res) => {
+  // #swagger.summary = "Realiza o login de um atleta"
   try {
     const { email, senha } = req.body;
 
@@ -86,6 +88,7 @@ function tokenAtleta(req, res, next) {
 
 // Rota para o atleta atualizar seus dados
 router.put('/editar', tokenAtleta, async (req, res) => {
+  // #swagger.summary = "Edita dados do atleta logado"
   try {
     const { nome, email, senha, danId } = req.body;
     const atletaId = req.atletaId; // ID do atleta logado
@@ -128,6 +131,7 @@ router.put('/editar', tokenAtleta, async (req, res) => {
 
 //Rota que mostra todos os atletas que tem um mesmo dan --> lógica de negocio
 router.get('/dan/:id', async (req, res) => {
+  // #swagger.summary = "Mostra todos os atletas que possuem o mesmo Dan"
   try {
     const danId = req.params.id;
 

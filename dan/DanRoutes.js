@@ -5,7 +5,8 @@ const Dan = require('./Dan');
 
 //lista todos os dans ==> dan?page=2
 
-  router.get('/dan', async (req, res) => {
+  router.get('/', async (req, res) => {
+    // #swagger.summary = "Lista todos os Dans (apenas 5 por página)"
     try {
       const page = req.query.page || 1; // Página atual, padrão é 1
       const perPage = 5; // Atletas por página

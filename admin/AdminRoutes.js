@@ -8,6 +8,7 @@ const Dan = require('../dan/Dan');
 
 // Rota para criar um novo admin
 router.post("/",tokenAdm, async (req, res) => {
+  // #swagger.summary = "Cria novos Admins"
   try {
     const { user, senha } = req.body;
 
@@ -35,6 +36,7 @@ router.post("/",tokenAdm, async (req, res) => {
 
 // Rota para realizar login do admin
 router.post('/login', async (req, res) => {
+  // #swagger.summary = "Realiza o login dos Admins"
   try {
     const { user, senha } = req.body;
 
@@ -84,6 +86,7 @@ function tokenAdm(req, res, next) {
 
 // Rota para listar todos os admins, apenas 5 por pagina
 router.get('/', tokenAdm, async (req, res) => {
+  // #swagger.summary = "Lista todos os Admins"
   try {
     const page = req.query.page || 1;
     const perPage = 5;
@@ -104,6 +107,7 @@ router.get('/', tokenAdm, async (req, res) => {
 
 // Rota para o admin excluir um atleta pelo email
 router.delete('/atletas/deletar', tokenAdm, async (req, res) => {
+  // #swagger.summary = "Exclui atletas pelo email (rota para Admins)"
   try {
     const { email } = req.body;
 
@@ -124,6 +128,7 @@ router.delete('/atletas/deletar', tokenAdm, async (req, res) => {
 
 // Rota para editar os dados de admins
 router.put('/editar', tokenAdm, async (req, res) => {
+  // #swagger.summary = "Edita dados do Admins logado"
   try {
     const { user, senha } = req.body;
 
@@ -153,6 +158,7 @@ router.put('/editar', tokenAdm, async (req, res) => {
 
 //Rota para listar todos os atletas com todos os dados, apenas 5 atletas por pagina
 router.get('/atletas', tokenAdm, async (req, res) => {
+  // #swagger.summary = "Lista todos os atletas com todos os dados deles (apenas 5 atletas por página)"
   try {
     const page = req.query.page || 1;
     const perPage = 5;
@@ -172,6 +178,7 @@ router.get('/atletas', tokenAdm, async (req, res) => {
 
 // Rota para admins editarem dados dos atletas
 router.put('/atletas/editar/:email', tokenAdm, async (req, res) => {
+  // #swagger.summary = "Edita dados dos atletas (rota para Admins)"
   try {
     const { email } = req.params;
     const { nome, novaSenha, novoDanId } = req.body;
@@ -199,6 +206,7 @@ router.put('/atletas/editar/:email', tokenAdm, async (req, res) => {
 
 // Rota para deletar um admin
 router.delete('/deletar/:user',tokenAdm, async (req, res) => {
+  // #swagger.summary = "Deleta o Admin pelo User dele"
   try {
     const { user } = req.params;
     const admin = await Admin.findOne({ where: { user } });
@@ -216,6 +224,7 @@ router.delete('/deletar/:user',tokenAdm, async (req, res) => {
 
 // Rota para criar um dan
 router.post("/dan",tokenAdm, async (req, res) => {
+  // #swagger.summary = "Cria um novo Dan"
   try {
     const {nome} = req.body;
 

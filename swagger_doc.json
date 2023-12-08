@@ -182,6 +182,20 @@
         }
       }
     },
+    "/dans/mais-reprovados": {
+      "get": {
+        "summary": "Retorna o nome do dan e a quantidade de reprovados do dan que tem o mair número de reprovados",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/admin/": {
       "post": {
         "summary": "Cria novos Admins",

@@ -24,5 +24,36 @@ const Dan = require('./Dan');
       res.status(500).json({ error: 'Erro ao buscar atletas' });
     }
   });
+
+// Retorna qual o Dan com mair número de reprovados --> lógica de negócios
+  router.get('/mais-reprovados', async (req, res) => {
+     // #swagger.summary = "Retorna o nome do dan e a quantidade de reprovados do dan que tem o mair número de reprovados"
+
+    const numReprovados = await Dan.max('reprovados');
+  
+    if (numReprovados) {
+        const danComMaisReprovados = await Dan.findOne({
+            where: {
+                reprovados: numReprovados,
+            },
+        });
+  
+        if (danComMaisReprovados) {
+            res.status(200).send({
+                nome: danComMaisReprovados.nome,
+                reprovados: danComMaisReprovados.reprovados,
+            });
+        } else {
+            res.status(404).send({
+                message: 'Não foi encontrado nenhum dan com reprovados.',
+            });
+        }
+    } else {
+        res.status(404).send({
+            message: 'Não foi encontrado nenhum dan com reprovados.',
+        });
+    }
+  });
+  
   
 module.exports = router;

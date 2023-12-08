@@ -129,7 +129,7 @@ router.put('/editar', tokenAtleta, async (req, res) => {
 });
 
 
-//Rota que mostra todos os atletas que tem um mesmo dan --> lógica de negocio
+//Rota que mostra todos os atletas que tem um mesmo dan --> lógica de negócios
 router.get('/dan/:id', async (req, res) => {
   // #swagger.summary = "Mostra todos os atletas que possuem o mesmo Dan"
   try {

@@ -18,6 +18,26 @@ router.get('/install', async (req, res) => {
         senha: hashSenha
       });
     }
+
+    const dansData =[
+      {nome:'1º Kyo',reprovados:2},
+      {nome:'1º Dan',reprovados:33},
+      {nome:'2º Dan',reprovados:42},
+      {nome:'3º Dan',reprovados:88},
+      {nome:'4º Dan',reprovados:32},
+      {nome:'5º Dan',reprovados:28},
+      {nome:'6º Dan',reprovados:29},
+      {nome:'7º Dan',reprovados:18}
+    
+    ]
+
+    for(const dan of dansData){
+      await Dan.create({
+        nome: dan.nome,
+        reprovados:dan.reprovados
+      });
+    } 
+
     const atletaData = [
       { nome: 'João Pedro', email: 'joao@gmail.com', senha: 'senha123', danId: 3 },
       { nome: 'Thais', email: 'thais@gmail.com', senha: 'senha123', danId: 2 },
@@ -40,23 +60,7 @@ router.get('/install', async (req, res) => {
       });
     }
 
-    const dansData =[
-      {nome:'1º Kyo'},
-      {nome:'1º Dan'},
-      {nome:'2º Dan'},
-      {nome:'3º Dan'},
-      {nome:'4º Dan'},
-      {nome:'5º Dan'},
-      {nome:'6º Dan'},
-      {nome:'7º Dan'}
-    
-    ]
-
-    for(const dan of dansData){
-      await Dan.create({
-        nome: dan.nome
-      });
-    }
+   
 
     res.status(201).json({ message: 'Dados fictícios instalados com sucesso!' });
   } catch (error) {
